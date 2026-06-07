@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rouler-O-Vert - GEO & Schema.org Knowledge Graph Visualizer</title>
+    <style>
+        .vis-network { position: relative; padding: 0; margin: 0; width: 100%; height: 100%; }
+        
+        :root {
+            --rov-green: #00824A;
+            --rov-accent: #10B981;
+            --bg-light: #F4F7F5;
+            --bg-white: #FFFFFF;
+            --text-dark: #111827;
+            --text-muted: #4B5563;
+            --border-color: #E5E7EB;
+            --graph-bg: #F9FAFB;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: "Public Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 300px;
+            background-color: var(--bg-white);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.02);
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 2px solid var(--rov-green);
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.2rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+            color: var(--rov-green);
+        }
+
+        .sidebar-header p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+            font-weight: 500;
+        }
+
+        .url-list { list-style: none; overflow-y: auto; flex: 1; padding: 15px 10px; }
+
+        .url-item {
+            padding: 14px 16px;
+            cursor: pointer;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: all 0.15s ease-in-out;
+            border-left: 3px solid transparent;
+        }
+
+        .url-item:hover {
+            background-color: #E8F5E9;
+            color: var(--rov-green);
+            border-left-color: #A5D6A7;
+        }
+
+        .url-item.active {
+            background-color: #D1E7DD;
+            color: var(--rov-green);
+            font-weight: 700;
+            border-left-color: var(--rov-green);
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            background-color: var(--bg-light);
+        }
+
+        .toolbar {
+            height: 70px;
+            background-color: var(--bg-white);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+            z-index: 10;
+        }
+
+        .page-title { font-size: 0.95rem; font-weight: 700; color: var(--rov-green); }
+
+        .view-toggle { display: flex; background-color: var(--bg-light); padding: 3px; border: 1px solid var(--border-color); }
+
+        .toggle-btn {
+            background: none; border: none; color: var(--text-muted); padding: 8px 16px;
+            font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em;
+            cursor: pointer; transition: all 0.15s;
+        }
+
+        .toggle-btn.active { background-color: var(--rov-green); color: var(--bg-white); }
+
+        .view-container { flex: 1; position: relative; }
+
+        .view-pane { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: none; }
+
+        .view-pane.active { display: block; }
+
+        #graph-canvas {
+            background-color: var(--graph-bg);
+            background-image: linear-gradient(var(--border-color) 1px, transparent 1px),
+                              linear-gradient(90deg, var(--border-color) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+
+        #network-holder { width: 100%; height: 100%; }
+
+        .inspector-panel {
+            position: absolute; right: 24px; top: 24px; width: 340px;
+            background-color: var(--bg-white); border-top: 4px solid var(--rov-accent);
+            border-left: 1px solid var(--border-color); border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color); padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); pointer-events: auto; z-index: 5;
+        }
+
+        .inspector-title {
+            font-size: 0.85rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;
+            color: var(--rov-green); margin-bottom: 14px; border-bottom: 1px solid var(--border-color); padding-bottom: 6px;
+        }
+
+        .scalar-properties { font-size: 0.85rem; }
+
+        .scalar-row { display: flex; padding: 8px 0; border-bottom: 1px dashed var(--border-color); }
+
+        .scalar-row:last-child { border-bottom: none; }
+
+        .scalar-key { color: var(--text-muted); width: 35%; font-weight: 600; }
+
+        .scalar-value { color: var(--text-dark); width: 65%; font-weight: 500; word-break: break-word; }
+
+        #code-pane { padding: 24px; overflow: auto; background-color: #1E1E24; }
+
+        pre { font-family: 'Fira Code', Consolas, Monaco, monospace; font-size: 0.85rem; color: #9CDCFE; line-height: 1.6; }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/standalone/umd/vis-network.min.js"></script>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h1>Rouler-O-Vert</h1>
+            <p>Profil de lien SEO & Partenaires SEO</p>
+        </div>
+        <ul class="url-list">
+            <li class="url-item active" onclick="setView('graph')">Profil de lien SEO</li>
+            <li class="url-item" onclick="setView('code')">Partenaires SEO</li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="toolbar">
+            <div class="page-title" id="current-url">Site cible : https://rouler-o-vert.green</div>
+            <div class="view-toggle">
+                <button class="toggle-btn active" id="btn-graph" onclick="setView('graph')">Profil de lien SEO</button>
+                <button class="toggle-btn" id="btn-code" onclick="setView('code')">Partenaires SEO</button>
+            </div>
+        </div>
+
+        <div class="view-container">
+            <div id="graph-canvas" class="view-pane active">
+                <div id="network-holder"></div>
+
+                <div class="inspector-panel">
+                    <div class="inspector-title" id="node-title">Entité sélectionnée</div>
+                    <div class="scalar-properties" id="inspector-content">
+                        <div class="text-muted" style="font-size: 0.85rem; font-style: italic;">Cliquez sur un nœud pour inspecter ses propriétés</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="code-pane" class="view-pane">
+                <pre><code id="json-raw"></code></pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const rawCsvData = [
+            {"domain": "mieuxrespirerenville.gouv.fr", "logo": "mieux-respirer en-ville.png"},
+            {"domain": "verdirmaflotte.fr", "logo": "verdir-ma-flotte.png"},
+            {"domain": "interlud.green", "logo": "interlud.png"},
+            {"domain": "automobile-propre.com", "logo": "automobile-propre.png"},
+            {"domain": "grandlyon.com", "logo": "metropole-grand-lyon.svg"},
+            {"domain": "lachainelogistiquedufroid.fr", "logo": "la-chaine-logistique-du-froid.svg"},
+            {"domain": "mixenn.bzh", "logo": "mixenn.svg"},
+            {"domain": "observatoire-transports-bretagne.fr", "logo": "observatoire-regional-des-transports-de-bretagne.jpg"},
+            {"domain": "squoltweser.blogspot.com", "logo": "squoltweser.png"},
+            {"domain": "webwiki.fr", "logo": "webwiki.png"},
+            {"domain": "auto-infos.fr", "logo": "auto-infos.png"},
+            {"domain": "bye.fyi", "logo": "bye-fyi.png"},
+            {"domain": "developpement-durable.gouv.fr", "logo": "ministere-de-la-transition-ecologique.svg"},
+            {"domain": "directorylinkservice.com", "logo": "directory-link-service.png"},
+            {"domain": "drjack.world", "logo": "drjack-world.png"},
+            {"domain": "ecologie.gouv.fr", "logo": "ministere-de-la-transition-ecologique.svg"},
+            {"domain": "garage-automobiles-versailles.fr", "logo": "garage-automobiles-versailles.png"},
+            {"domain": "gaz-mobilite.fr", "logo": "gaz-mobilite-fr.png"},
+            {"domain": "goooogla.com", "logo": "goooogla-directory.png"},
+            {"domain": "institutparisregion.fr", "logo": "l-institut-paris-region.png"},
+            {"domain": "logistique-grandest.fr", "logo": "portail-logistique-grand-est.png"},
+            {"domain": "otre.org", "logo": "otre.svg"},
+            {"domain": "presseagence.fr", "logo": "presse-agence.svg"},
+            {"domain": "toplist.co.in", "logo": "toplist-co-in.png"},
+            {"domain": "unostra.fr", "logo": "union-nationale-des-organisations-syndicales-des-transporteurs-routiers-automobiles.jpg"},
+            {"domain": "backlinks-checker.com", "logo": "website-logo.png"},
+            {"domain": "analyticshaven.top", "logo": "Internet logo.png"},
+            {"domain": "anchorurl.cloud", "logo": "Internet logo.png"},
+            {"domain": "atomizelink.icu", "logo": "Internet logo.png"},
+            {"domain": "blinks.monster", "logo": "Internet logo.png"},
+            {"domain": "buzzshrink.website", "logo": "Internet logo.png"},
+            {"domain": "ready.pro", "logo": "Internet logo.png"},
+            {"domain": "seodomains.website", "logo": "Internet logo.png"},
+            {"domain": "creativeposts.top", "logo": "Internet logo.png"},
+            {"domain": "knows.sbs", "logo": "Internet logo.png"},
+            {"domain": "takes.sbs", "logo": "Internet logo.png"},
+            {"domain": "knows.monster", "logo": "Internet logo.png"},
+            {"domain": "metamagic.top", "logo": "Internet logo.png"},
+            {"domain": "newlyregddomains.com", "logo": "Internet logo.png"},
+            {"domain": "seol.store", "logo": "Internet logo.png"},
+            {"domain": "sites.loseyourip.com", "logo": "Internet logo.png"},
+            {"domain": "factmags.com", "logo": "Internet logo.png"},
+            {"domain": "wants.cfd", "logo": "Internet logo.png"}
+        ];
+
+        document.getElementById('json-raw').textContent = JSON.stringify(rawCsvData, null, 2);
+
+        let network = null;
+        let globalNodesDataSet = null;
+        let globalEdgesDataSet = null;
+
+        function initNetwork() {
+            const container = document.getElementById('network-holder');
+            
+            const nodes = [
+                {
+                    id: "central",
+                    label: "rouler-o-vert.green",
+                    shape: "image",
+                    image: "logos/rouler-o-vert.svg",
+                    size: 50
+                }
+            ];
+            
+            const edges = [];
+
+            rawCsvData.forEach((item, index) => {
+                const nodeId = `node_${index}`;
+                nodes.push({
+                    id: nodeId,
+                    label: item.domain,
+                    shape: "image",
+                    image: "logos/" + item.logo,
+                    size: 30
+                });
+                
+                edges.push({
+                    id: `edge_${nodeId}`,
+                    from: nodeId,
+                    to: "central",
+                    arrows: "to",
+                    color: { color: '#00824A', highlight: '#10B981' },
+                    width: 1.5
+                });
+            });
+
+            globalNodesDataSet = new vis.DataSet(nodes);
+            globalEdgesDataSet = new vis.DataSet(edges);
+
+            const options = {
+                physics: {
+                    enabled: true,
+                    barnesHut: {
+                        gravitationalConstant: -2500,
+                        centralGravity: 0.3,
+                        springLength: 160,
+                        springConstant: 0.04,
+                        damping: 0.09,
+                        avoidOverlap: 0.6
+                    },
+                    stabilization: { enabled: true, iterations: 1000 }
+                },
+                interaction: {
+                    hover: true,
+                    dragNodes: true,
+                    zoomView: true,
+                    dragView: true
+                }
+            };
+
+            network = new vis.Network(container, { nodes: globalNodesDataSet, edges: globalEdgesDataSet }, options);
+
+            network.on("stabilizationIterationsDone", function () {
+                network.setOptions({ physics: false });
+            });
+
+            network.on("click", function (params) {
+                if (params.nodes.length === 0) {
+                    document.getElementById('node-title').innerText = "Entité sélectionnée";
+                    document.getElementById('inspector-content').innerHTML = `
+                        <div class="text-muted" style="font-size: 0.85rem; font-style: italic;">Cliquez sur un nœud pour inspecter ses propriétés</div>`;
+                    return;
+                }
+
+                const nodeId = params.nodes[0];
+                const clickedNode = globalNodesDataSet.get(nodeId);
+
+                if (clickedNode) {
+                    document.getElementById('node-title').innerText = "Entité : " + clickedNode.label;
+                    
+                    const isCentral = nodeId === "central";
+                    document.getElementById('inspector-content').innerHTML = `
+                        <div class="scalar-row">
+                            <div class="scalar-key">Nom de domaine</div>
+                            <div class="scalar-value">${clickedNode.label}</div>
+                        </div>
+                        <div class="scalar-row">
+                            <div class="scalar-key">Fichier logo</div>
+                            <div class="scalar-value">${clickedNode.image}</div>
+                        </div>
+                        <div class="scalar-row">
+                            <div class="scalar-key">Type</div>
+                            <div class="scalar-value">${isCentral ? "Nœud central (Cible)" : "Nœud périphérique (Backlink)"}</div>
+                        </div>`;
+                }
+            });
+        }
+
+        function setView(viewType) {
+            document.querySelectorAll('.view-pane').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.toggle-btn').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.url-item').forEach(el => el.classList.remove('active'));
+            
+            const menuItems = document.querySelectorAll('.url-item');
+            if(viewType === 'graph') {
+                document.getElementById('graph-canvas').classList.add('active');
+                document.getElementById('btn-graph').classList.add('active');
+                if(menuItems[0]) menuItems[0].classList.add('active');
+            } else {
+                document.getElementById('code-pane').classList.add('active');
+                document.getElementById('btn-code').classList.add('active');
+                if(menuItems[1]) menuItems[1].classList.add('active');
+            }
+        }
+
+        window.addEventListener("load", () => {
+            initNetwork();
+        });
+    </script>
+</body>
+</html>
