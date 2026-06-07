@@ -167,11 +167,11 @@
     <div class="sidebar">
         <div class="sidebar-header">
             <h1>Rouler-O-Vert</h1>
-            <p>Profil de lien SEO & Partenaires SEO</p>
+            <p>Visualisation des Écosystèmes</p>
         </div>
         <ul class="url-list">
-            <li class="url-item active" onclick="setView('graph')">Profil de lien SEO</li>
-            <li class="url-item" onclick="setView('code')">Partenaires SEO</li>
+            <li class="url-item active" id="sidebar-links" onclick="switchDataset('links')">Profil de lien SEO</li>
+            <li class="url-item" id="sidebar-partners" onclick="switchDataset('partners')">Partenaires SEO</li>
         </ul>
     </div>
 
@@ -179,8 +179,8 @@
         <div class="toolbar">
             <div class="page-title" id="current-url">Site cible : https://rouler-o-vert.green</div>
             <div class="view-toggle">
-                <button class="toggle-btn active" id="btn-graph" onclick="setView('graph')">Profil de lien SEO</button>
-                <button class="toggle-btn" id="btn-code" onclick="setView('code')">Partenaires SEO</button>
+                <button class="toggle-btn active" id="btn-graph" onclick="setView('graph')">Vue Graphique</button>
+                <button class="toggle-btn" id="btn-code" onclick="setView('code')">Code JSON</button>
             </div>
         </div>
 
@@ -203,7 +203,7 @@
     </div>
 
     <script>
-        const rawCsvData = [
+        const linkProfileData = [
             {"domain": "mieuxrespirerenville.gouv.fr", "logo": "mieux-respirer en-ville.png"},
             {"domain": "verdirmaflotte.fr", "logo": "verdir-ma-flotte.png"},
             {"domain": "interlud.green", "logo": "interlud.png"},
@@ -249,14 +249,40 @@
             {"domain": "wants.cfd", "logo": "website-logo.png"}
         ];
 
-        document.getElementById('json-raw').textContent = JSON.stringify(rawCsvData, null, 2);
+        const partnersData = [
+            {"domain": "mieuxrespirerenville.gouv.fr", "logo": "mieux-respirer en-ville.png"},
+            {"domain": "verdirmaflotte.fr", "logo": "verdir-ma-flotte.png"},
+            {"domain": "interlud.green", "logo": "interlud.png"},
+            {"domain": "automobile-propre.com", "logo": "automobile-propre.png"},
+            {"domain": "grandlyon.com", "logo": "metropole-grand-lyon.svg"},
+            {"domain": "lachainelogistiquedufroid.fr", "logo": "la-chaine-logistique-du-froid.svg"},
+            {"domain": "mixenn.bzh", "logo": "mixenn.svg"},
+            {"domain": "observatoire-transports-bretagne.fr", "logo": "observatoire-regional-des-transports-de-bretagne.jpg"},
+            {"domain": "auto-infos.fr", "logo": "auto-infos.png"},
+            {"domain": "developpement-durable.gouv.fr", "logo": "ministere-de-la-transition-ecologique.svg"},
+            {"domain": "ecologie.gouv.fr", "logo": "ministere-de-la-transition-ecologique.svg"},
+            {"domain": "garage-automobiles-versailles.fr", "logo": "garage-automobiles-versailles.png"},
+            {"domain": "gaz-mobilite.fr", "logo": "gaz-mobilite-fr.png"},
+            {"domain": "institutparisregion.fr", "logo": "l-institut-paris-region.png"},
+            {"domain": "logistique-grandest.fr", "logo": "portail-logistique-grand-est.png"},
+            {"domain": "otre.org", "logo": "otre.svg"},
+            {"domain": "presseagence.fr", "logo": "presse-agence.svg"},
+            {"domain": "unostra.fr", "logo": "union-nationale-des-organisations-syndicales-des-transporteurs-routiers-automobiles.jpg"},
+            {"domain": "logistic-low-carbon.green", "logo": "logistic-low-carbon.png"},
+            {"domain": "cgf-grossistes.fr", "logo": "confederation-des-grossistes-de-france.png"},
+            {"domain": "cerema.fr", "logo": "cerema.png"}
+        ];
 
         let network = null;
         let globalNodesDataSet = null;
         let globalEdgesDataSet = null;
+        let currentDatasetType = 'links';
 
         function initNetwork() {
             const container = document.getElementById('network-holder');
+            const activeData = currentDatasetType === 'links' ? linkProfileData : partnersData;
+            
+            document.getElementById('json-raw').textContent = JSON.stringify(activeData, null, 2);
             
             const nodes = [
                 {
@@ -272,7 +298,7 @@
             
             const edges = [];
 
-            rawCsvData.forEach((item, index) => {
+            activeData.forEach((item, index) => {
                 const nodeId = `node_${index}`;
                 nodes.push({
                     id: nodeId,
@@ -319,11 +345,20 @@
                 }
             };
 
+            if (network !== null) {
+                network.destroy();
+                network = null;
+            }
+
             network = new vis.Network(container, { nodes: globalNodesDataSet, edges: globalEdgesDataSet }, options);
 
             network.on("stabilizationIterationsDone", function () {
                 network.setOptions({ physics: false });
             });
+
+            document.getElementById('node-title').innerText = "Entité sélectionnée";
+            document.getElementById('inspector-content').innerHTML = `
+                <div class="text-muted" style="font-size: 0.85rem; font-style: italic;">Cliquez sur un nœud pour inspecter ses propriétés</div>`;
 
             network.on("click", function (params) {
                 const allNodes = globalNodesDataSet.get();
@@ -346,6 +381,8 @@
 
                     document.getElementById('node-title').innerText = "Entité : " + clickedNode.domainName;
                     const isCentral = nodeId === "central";
+                    const nodeRole = isCentral ? "Nœud central (Cible)" : (currentDatasetType === 'links' ? "Nœud périphérique (Backlink)" : "Nœud périphérique (Partenaire)");
+                    
                     document.getElementById('inspector-content').innerHTML = `
                         <div class="scalar-row">
                             <div class="scalar-key">Nom de domaine</div>
@@ -357,26 +394,33 @@
                         </div>
                         <div class="scalar-row">
                             <div class="scalar-key">Type</div>
-                            <div class="scalar-value">${isCentral ? "Nœud central (Cible)" : "Nœud périphérique (Backlink)"}</div>
+                            <div class="scalar-value">${nodeRole}</div>
                         </div>`;
                 }
             });
         }
 
+        function switchDataset(type) {
+            currentDatasetType = type;
+            document.querySelectorAll('.url-item').forEach(el => el.classList.remove('active'));
+            if(type === 'links') {
+                document.getElementById('sidebar-links').classList.add('active');
+            } else {
+                document.getElementById('sidebar-partners').classList.add('active');
+            }
+            initNetwork();
+        }
+
         function setView(viewType) {
             document.querySelectorAll('.view-pane').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.toggle-btn').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.url-item').forEach(el => el.classList.remove('active'));
             
-            const menuItems = document.querySelectorAll('.url-item');
             if(viewType === 'graph') {
                 document.getElementById('graph-canvas').classList.add('active');
                 document.getElementById('btn-graph').classList.add('active');
-                if(menuItems[0]) menuItems[0].classList.add('active');
             } else {
                 document.getElementById('code-pane').classList.add('active');
                 document.getElementById('btn-code').classList.add('active');
-                if(menuItems[1]) menuItems[1].classList.add('active');
             }
         }
 
