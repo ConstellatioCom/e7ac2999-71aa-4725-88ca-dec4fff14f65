@@ -230,23 +230,23 @@
             {"domain": "toplist.co.in", "logo": "toplist-co-in.png"},
             {"domain": "unostra.fr", "logo": "union-nationale-des-organisations-syndicales-des-transporteurs-routiers-automobiles.jpg"},
             {"domain": "backlinks-checker.com", "logo": "website-logo.png"},
-            {"domain": "analyticshaven.top", "logo": "website-logo.png"},
-            {"domain": "anchorurl.cloud", "logo": "website-logo.png"},
-            {"domain": "atomizelink.icu", "logo": "website-logo.png"},
-            {"domain": "blinks.monster", "logo": "website-logo.png"},
-            {"domain": "buzzshrink.website", "logo": "website-logo.png"},
-            {"domain": "ready.pro", "logo": "website-logo.png"},
-            {"domain": "seodomains.website", "logo": "website-logo.png"},
-            {"domain": "creativeposts.top", "logo": "website-logo.png"},
-            {"domain": "knows.sbs", "logo": "website-logo.png"},
-            {"domain": "takes.sbs", "logo": "website-logo.png"},
-            {"domain": "knows.monster", "logo": "website-logo.png"},
-            {"domain": "metamagic.top", "logo": "website-logo.png"},
-            {"domain": "newlyregddomains.com", "logo": "website-logo.png"},
-            {"domain": "seol.store", "logo": "website-logo.png"},
-            {"domain": "sites.loseyourip.com", "logo": "website-logo.png"},
-            {"domain": "factmags.com", "logo": "website-logo.png"},
-            {"domain": "wants.cfd", "logo": "website-logo.png"}
+            {"domain": "analyticshaven.top", "logo": "Internet logo.png"},
+            {"domain": "anchorurl.cloud", "logo": "Internet logo.png"},
+            {"domain": "atomizelink.icu", "logo": "Internet logo.png"},
+            {"domain": "blinks.monster", "logo": "Internet logo.png"},
+            {"domain": "buzzshrink.website", "logo": "Internet logo.png"},
+            {"domain": "ready.pro", "logo": "Internet logo.png"},
+            {"domain": "seodomains.website", "logo": "Internet logo.png"},
+            {"domain": "creativeposts.top", "logo": "Internet logo.png"},
+            {"domain": "knows.sbs", "logo": "Internet logo.png"},
+            {"domain": "takes.sbs", "logo": "Internet logo.png"},
+            {"domain": "knows.monster", "logo": "Internet logo.png"},
+            {"domain": "metamagic.top", "logo": "Internet logo.png"},
+            {"domain": "newlyregddomains.com", "logo": "Internet logo.png"},
+            {"domain": "seol.store", "logo": "Internet logo.png"},
+            {"domain": "sites.loseyourip.com", "logo": "Internet logo.png"},
+            {"domain": "factmags.com", "logo": "Internet logo.png"},
+            {"domain": "wants.cfd", "logo": "Internet logo.png"}
         ];
 
         document.getElementById('json-raw').textContent = JSON.stringify(rawCsvData, null, 2);
@@ -265,7 +265,7 @@
                     label: "",
                     shape: "image",
                     image: "logos/rouler-o-vert.svg",
-                    size: 60,
+                    size: 90,
                     font: { color: '#00824A', size: 14, face: 'Public Sans', strokeWidth: 4, strokeColor: '#FFFFFF' }
                 }
             ];
@@ -288,9 +288,10 @@
                     id: `edge_${nodeId}`,
                     from: nodeId,
                     to: "central",
-                    arrows: "to",
+                    arrows: { middle: { enabled: true, scaleFactor: 1.2 } },
                     color: { color: '#00824A', highlight: '#10B981' },
-                    width: 1.5
+                    width: 1.5,
+                    length: 450 + (index % 5) * 70
                 });
             });
 
@@ -301,9 +302,9 @@
                 physics: {
                     enabled: true,
                     barnesHut: {
-                        gravitationalConstant: -12000,
-                        centralGravity: 0.1,
-                        springLength: 380,
+                        gravitationalConstant: -25000,
+                        centralGravity: 0.05,
+                        springLength: 450,
                         springConstant: 0.01,
                         damping: 0.09,
                         avoidOverlap: 1
