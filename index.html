@@ -43,18 +43,15 @@
             border-bottom: 2px solid var(--rov-green);
         }
 
-        .sidebar-header h1 {
-            font-size: 1.2rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.02em;
-            color: var(--rov-green);
+        .sidebar-header img {
+            height: 35px;
+            display: block;
         }
 
         .sidebar-header p {
             font-size: 0.85rem;
             color: var(--text-muted);
-            margin-top: 6px;
+            margin-top: 8px;
             font-weight: 500;
         }
 
@@ -155,10 +152,6 @@
         .scalar-key { color: var(--text-muted); width: 35%; font-weight: 600; }
 
         .scalar-value { color: var(--text-dark); width: 65%; font-weight: 500; word-break: break-word; }
-
-        #code-pane { padding: 24px; overflow: auto; background-color: #1E1E24; }
-
-        pre { font-family: 'Fira Code', Consolas, Monaco, monospace; font-size: 0.85rem; color: #9CDCFE; line-height: 1.6; }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/standalone/umd/vis-network.min.js"></script>
 </head>
@@ -166,7 +159,7 @@
 
     <div class="sidebar">
         <div class="sidebar-header">
-            <h1>Rouler-O-Vert</h1>
+            <img src="logos/rouler-o-vert.svg" alt="Rouler-O-Vert">
             <p>Visualisation des Écosystèmes</p>
         </div>
         <ul class="url-list">
@@ -179,8 +172,8 @@
         <div class="toolbar">
             <div class="page-title" id="current-url">Site cible : https://rouler-o-vert.green</div>
             <div class="view-toggle">
-                <button class="toggle-btn active" id="btn-graph" onclick="setView('graph')">Vue Graphique</button>
-                <button class="toggle-btn" id="btn-code" onclick="setView('code')">Code JSON</button>
+                <button class="toggle-btn active" id="btn-links" onclick="switchDataset('links')">Profil de lien SEO</button>
+                <button class="toggle-btn" id="btn-partners" onclick="switchDataset('partners')">Partenaires SEO</button>
             </div>
         </div>
 
@@ -194,10 +187,6 @@
                         <div class="text-muted" style="font-size: 0.85rem; font-style: italic;">Cliquez sur un nœud pour inspecter ses propriétés</div>
                     </div>
                 </div>
-            </div>
-
-            <div id="code-pane" class="view-pane">
-                <pre><code id="json-raw"></code></pre>
             </div>
         </div>
     </div>
@@ -282,8 +271,6 @@
             const container = document.getElementById('network-holder');
             const activeData = currentDatasetType === 'links' ? linkProfileData : partnersData;
             
-            document.getElementById('json-raw').textContent = JSON.stringify(activeData, null, 2);
-            
             const nodes = [
                 {
                     id: "central",
@@ -341,7 +328,8 @@
                     hover: true,
                     dragNodes: true,
                     zoomView: true,
-                    dragView: true
+                    dragView: true,
+                    zoomSpeed: 0.2
                 }
             };
 
@@ -403,25 +391,16 @@
         function switchDataset(type) {
             currentDatasetType = type;
             document.querySelectorAll('.url-item').forEach(el => el.classList.remove('active'));
-            if(type === 'links') {
-                document.getElementById('sidebar-links').classList.add('active');
-            } else {
-                document.getElementById('sidebar-partners').classList.add('active');
-            }
-            initNetwork();
-        }
-
-        function setView(viewType) {
-            document.querySelectorAll('.view-pane').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.toggle-btn').forEach(el => el.classList.remove('active'));
             
-            if(viewType === 'graph') {
-                document.getElementById('graph-canvas').classList.add('active');
-                document.getElementById('btn-graph').classList.add('active');
+            if(type === 'links') {
+                document.getElementById('sidebar-links').classList.add('active');
+                document.getElementById('btn-links').classList.add('active');
             } else {
-                document.getElementById('code-pane').classList.add('active');
-                document.getElementById('btn-code').classList.add('active');
+                document.getElementById('sidebar-partners').classList.add('active');
+                document.getElementById('btn-partners').classList.add('active');
             }
+            initNetwork();
         }
 
         window.addEventListener("load", () => {
