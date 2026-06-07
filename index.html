@@ -261,10 +261,12 @@
             const nodes = [
                 {
                     id: "central",
-                    label: "rouler-o-vert.green",
+                    domainName: "rouler-o-vert.green",
+                    label: "",
                     shape: "image",
                     image: "logos/rouler-o-vert.svg",
-                    size: 50
+                    size: 60,
+                    font: { color: '#00824A', size: 14, face: 'Public Sans', strokeWidth: 4, strokeColor: '#FFFFFF' }
                 }
             ];
             
@@ -274,10 +276,12 @@
                 const nodeId = `node_${index}`;
                 nodes.push({
                     id: nodeId,
-                    label: item.domain,
+                    domainName: item.domain,
+                    label: "",
                     shape: "image",
                     image: "logos/" + item.logo,
-                    size: 30
+                    size: 35,
+                    font: { color: '#111827', size: 12, face: 'Public Sans', strokeWidth: 3, strokeColor: '#FFFFFF' }
                 });
                 
                 edges.push({
@@ -297,14 +301,14 @@
                 physics: {
                     enabled: true,
                     barnesHut: {
-                        gravitationalConstant: -2500,
-                        centralGravity: 0.3,
-                        springLength: 160,
-                        springConstant: 0.04,
+                        gravitationalConstant: -12000,
+                        centralGravity: 0.1,
+                        springLength: 380,
+                        springConstant: 0.01,
                         damping: 0.09,
-                        avoidOverlap: 0.6
+                        avoidOverlap: 1
                     },
-                    stabilization: { enabled: true, iterations: 1000 }
+                    stabilization: { enabled: true, iterations: 2000 }
                 },
                 interaction: {
                     hover: true,
@@ -321,7 +325,11 @@
             });
 
             network.on("click", function (params) {
+                const allNodes = globalNodesDataSet.get();
+                allNodes.forEach(n => { n.label = ""; });
+
                 if (params.nodes.length === 0) {
+                    globalNodesDataSet.update(allNodes);
                     document.getElementById('node-title').innerText = "Entité sélectionnée";
                     document.getElementById('inspector-content').innerHTML = `
                         <div class="text-muted" style="font-size: 0.85rem; font-style: italic;">Cliquez sur un nœud pour inspecter ses propriétés</div>`;
@@ -329,16 +337,18 @@
                 }
 
                 const nodeId = params.nodes[0];
-                const clickedNode = globalNodesDataSet.get(nodeId);
+                const clickedNode = allNodes.find(n => n.id === nodeId);
 
                 if (clickedNode) {
-                    document.getElementById('node-title').innerText = "Entité : " + clickedNode.label;
-                    
+                    clickedNode.label = clickedNode.domainName;
+                    globalNodesDataSet.update(clickedNode);
+
+                    document.getElementById('node-title').innerText = "Entité : " + clickedNode.domainName;
                     const isCentral = nodeId === "central";
                     document.getElementById('inspector-content').innerHTML = `
                         <div class="scalar-row">
                             <div class="scalar-key">Nom de domaine</div>
-                            <div class="scalar-value">${clickedNode.label}</div>
+                            <div class="scalar-value">${clickedNode.domainName}</div>
                         </div>
                         <div class="scalar-row">
                             <div class="scalar-key">Fichier logo</div>
