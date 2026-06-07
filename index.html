@@ -327,9 +327,8 @@
                 interaction: {
                     hover: true,
                     dragNodes: true,
-                    zoomView: true,
-                    dragView: true,
-                    zoomSpeed: 0.4
+                    zoomView: false,
+                    dragView: true
                 }
             };
 
@@ -405,6 +404,26 @@
 
         window.addEventListener("load", () => {
             initNetwork();
+
+            document.getElementById('network-holder').addEventListener('wheel', function (e) {
+                e.preventDefault();
+                if (!network) return;
+
+                const oldScale = network.getScale();
+                const zoomFactor = 1.18; 
+                const newScale = e.deltaY < 0 ? oldScale * zoomFactor : oldScale / zoomFactor;
+
+                const pointerCanvas = network.getEventProperties(e).pointer.canvas;
+                const currentCenter = network.getViewPosition();
+
+                const newCenterX = pointerCanvas.x - (pointerCanvas.x - currentCenter.x) * (oldScale / newScale);
+                const newCenterY = pointerCanvas.y - (pointerCanvas.y - currentCenter.y) * (oldScale / newScale);
+
+                network.moveTo({
+                    position: { x: newCenterX, y: newCenterY },
+                    scale: newScale
+                });
+            }, { passive: false });
         });
     </script>
 </body>
