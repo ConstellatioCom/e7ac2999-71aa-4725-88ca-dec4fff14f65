@@ -405,17 +405,25 @@
         window.addEventListener("load", () => {
             initNetwork();
 
-            document.getElementById('network-holder').addEventListener('wheel', function (e) {
+            const holder = document.getElementById('network-holder');
+            holder.addEventListener('wheel', function (e) {
                 e.preventDefault();
                 if (!network) return;
 
                 const oldScale = network.getScale();
-                const zoomFactor = 1.18; 
+                const zoomFactor = 1.12; // Modifiable pour ajuster la vitesse globale
                 const newScale = e.deltaY < 0 ? oldScale * zoomFactor : oldScale / zoomFactor;
 
-                const pointerCanvas = network.getEventProperties(e).pointer.canvas;
-                const currentCenter = network.getViewPosition();
+                // Limites de zoom
+                if (newScale < 0.05 || newScale > 4) return;
 
+                const rect = holder.getBoundingClientRect();
+                const pointerCanvas = network.DOMtoCanvas({
+                    x: e.clientX - rect.left,
+                    y: e.clientY - rect.top
+                });
+                
+                const currentCenter = network.getViewPosition();
                 const newCenterX = pointerCanvas.x - (pointerCanvas.x - currentCenter.x) * (oldScale / newScale);
                 const newCenterY = pointerCanvas.y - (pointerCanvas.y - currentCenter.y) * (oldScale / newScale);
 
