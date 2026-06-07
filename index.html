@@ -256,7 +256,7 @@
             {"domain": "logistique-grandest.fr", "logo": "portail-logistique-grand-est.png"},
             {"domain": "otre.org", "logo": "otre.svg"},
             {"domain": "presseagence.fr", "logo": "presse-agence.svg"},
-            {"domain": "unostra.fr", "logo": "union-nationale-des-organisations-syndicales-des-transporteurs-routiers-automobiles.jpg"},
+            {"domain": "unostra.fr", "union-nationale-des-organisations-syndicales-des-transporteurs-routiers-automobiles.jpg"},
             {"domain": "logistic-low-carbon.green", "logo": "logistic-low-carbon.png"},
             {"domain": "cgf-grossistes.fr", "logo": "confederation-des-grossistes-de-france.png"},
             {"domain": "cerema.fr", "logo": "cerema.png"}
@@ -316,13 +316,13 @@
                     enabled: true,
                     barnesHut: {
                         gravitationalConstant: -25000,
-                        centralGravity: 0.01,
+                        centralGravity: 0,
                         springLength: 550,
-                        springConstant: 0.01,
+                        springConstant: 0.05,
                         damping: 0.09,
                         avoidOverlap: 1
                     },
-                    stabilization: { enabled: true, iterations: 2000 }
+                    stabilization: { enabled: true, iterations: 2500 }
                 },
                 interaction: {
                     hover: true,
