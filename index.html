@@ -163,8 +163,14 @@
             <p>Visualisation de l'écosystème</p>
         </div>
         <ul class="url-list">
-            <li class="url-item active" id="sidebar-links" onclick="switchDataset('links')">Profil de liens SEO</li>
-            <li class="url-item" id="sidebar-partners" onclick="switchDataset('partners')">Partenaires SEO</li>
+            <li class="url-item active" id="sidebar-links" onclick="switchMenu('links')">Profil de liens SEO</li>
+            <li class="url-item" id="sidebar-partners" onclick="switchMenu('partners')">Partenaires SEO</li>
+            <li class="url-item" id="sidebar-map" onclick="switchMenu('map')">Cartographie du site</li>
+            <li class="url-item" id="sidebar-arch" onclick="switchMenu('arch')">Architecture et sémantique</li>
+            <li class="url-item" id="sidebar-data" onclick="switchMenu('data')">Données structurées</li>
+            <li class="url-item" id="sidebar-reco" onclick="switchMenu('reco')">Recommandations techniques</li>
+            <li class="url-item" id="sidebar-keys" onclick="switchMenu('keys')">Étude de mots-clés</li>
+            <li class="url-item" id="sidebar-plan" onclick="switchMenu('plan')">Plan d'action</li>
         </ul>
     </div>
 
@@ -172,8 +178,14 @@
         <div class="toolbar">
             <div class="page-title" id="current-url">Site cible : https://rouler-o-vert.green</div>
             <div class="view-toggle">
-                <button class="toggle-btn active" id="btn-links" onclick="switchDataset('links')">Profil de liens SEO</button>
-                <button class="toggle-btn" id="btn-partners" onclick="switchDataset('partners')">Partenaires SEO</button>
+                <button class="toggle-btn active" id="btn-links" onclick="switchMenu('links')">Profil de liens SEO</button>
+                <button class="toggle-btn" id="btn-partners" onclick="switchMenu('partners')">Partenaires SEO</button>
+                <button class="toggle-btn" id="btn-map" onclick="switchMenu('map')">Cartographie du site</button>
+                <button class="toggle-btn" id="btn-arch" onclick="switchMenu('arch')">Architecture et sémantique</button>
+                <button class="toggle-btn" id="btn-data" onclick="switchMenu('data')">Données structurées</button>
+                <button class="toggle-btn" id="btn-reco" onclick="switchMenu('reco')">Recommandations techniques</button>
+                <button class="toggle-btn" id="btn-keys" onclick="switchMenu('keys')">Étude de mots-clés</button>
+                <button class="toggle-btn" id="btn-plan" onclick="switchMenu('plan')">Plan d'action</button>
             </div>
         </div>
 
@@ -387,19 +399,28 @@
             });
         }
 
-        function switchDataset(type) {
+        function switchMenu(type) {
             currentDatasetType = type;
+            // Réinitialisation des classes actives
             document.querySelectorAll('.url-item').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.toggle-btn').forEach(el => el.classList.remove('active'));
             
-            if(type === 'links') {
-                document.getElementById('sidebar-links').classList.add('active');
-                document.getElementById('btn-links').classList.add('active');
+            // Activation des éléments sélectionnés
+            const sidebarEl = document.getElementById(`sidebar-${type}`);
+            const btnEl = document.getElementById(`btn-${type}`);
+            if(sidebarEl) sidebarEl.classList.add('active');
+            if(btnEl) btnEl.classList.add('active');
+
+            // Logique de chargement
+            const container = document.getElementById('network-holder');
+            if (type === 'links' || type === 'partners') {
+                // Réinitialise la vue avant chargement
+                container.innerHTML = '';
+                initNetwork();
             } else {
-                document.getElementById('sidebar-partners').classList.add('active');
-                document.getElementById('btn-partners').classList.add('active');
+                // Mode placeholder pour les sections non implémentées
+                container.innerHTML = `<div style="display:flex; justify-content:center; align-items:center; height:100%; color:#9CA3AF; font-size:1.2rem;">Module « ${type} » en développement</div>`;
             }
-            initNetwork();
         }
 
         window.addEventListener("load", () => {
