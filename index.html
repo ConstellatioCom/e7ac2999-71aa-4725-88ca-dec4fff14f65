@@ -411,10 +411,9 @@
                 if (!network) return;
 
                 const oldScale = network.getScale();
-                const zoomFactor = 1.12; // Modifiable pour ajuster la vitesse globale
+                const zoomFactor = 1.12;
                 const newScale = e.deltaY < 0 ? oldScale * zoomFactor : oldScale / zoomFactor;
 
-                // Limites de zoom
                 if (newScale < 0.05 || newScale > 4) return;
 
                 const rect = holder.getBoundingClientRect();
