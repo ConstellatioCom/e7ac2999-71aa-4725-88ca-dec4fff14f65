@@ -116,10 +116,19 @@
         .toggle-btn.active { background-color: var(--rov-green); color: var(--bg-white); }
 
         .view-container { flex: 1; position: relative; }
+.view-pane { 
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    right: 0; 
+    bottom: 0; 
+    display: none; 
+    overflow-y: auto; 
+}
 
-        .view-pane { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: none; }
-
-        .view-pane.active { display: block; }
+.view-pane.active { 
+    display: block; 
+}
 
         #graph-canvas {
             background-color: var(--graph-bg);
@@ -534,9 +543,49 @@ function switchMenu(type) {
                     </iframe>
                 </div>`;
             break;
+        
             case 'plan':
-            container.innerHTML = `
-                <div style="padding: 40px; max-width: 800px; margin: 0 auto; color: #111827; line-height: 1.6;">
+    container.innerHTML = document.getElementById('plan-template').innerHTML;
+    break;
+        default:
+            container.innerHTML = `<div style="padding:20px; color:#9CA3AF; font-size:1.2rem;">Module « ${type} » en développement</div>`;
+    }
+}
+ window.addEventListener("load", () => {
+    initNetwork();
+
+    const holder = document.getElementById('network-holder');
+    holder.addEventListener('wheel', function (e) {
+        if (!network) return; // N'intervient que si le réseau est chargé
+        
+        e.preventDefault();
+        
+        const oldScale = network.getScale();
+        const zoomFactor = 1.12;
+        const newScale = e.deltaY < 0 ? oldScale * zoomFactor : oldScale / zoomFactor;
+
+        if (newScale < 0.05 || newScale > 4) return;
+
+        const rect = holder.getBoundingClientRect();
+        const pointerCanvas = network.DOMtoCanvas({
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top
+        });
+        
+        const currentCenter = network.getViewPosition();
+        const newCenterX = pointerCanvas.x - (pointerCanvas.x - currentCenter.x) * (oldScale / newScale);
+        const newCenterY = pointerCanvas.y - (pointerCanvas.y - currentCenter.y) * (oldScale / newScale);
+
+        network.moveTo({
+            position: { x: newCenterX, y: newCenterY },
+            scale: newScale
+        });
+    }, { passive: false });
+});
+    </script>
+    <template id="plan-template">
+
+          <div style="padding: 40px; max-width: 800px; margin: 0 auto; color: #111827; line-height: 1.6;">
                     <h1 style="color: #00824A; margin-bottom: 20px;">Plan stratégique – Écosystème Rouler-O-vert</h1>
                     <hr style="border: 0; border-top: 1px solid #E5E7EB; margin-bottom: 30px;">
                     
@@ -579,43 +628,8 @@ function switchMenu(type) {
                     <p>Analyse et sélection des termes cibles pour le référencement naturel.</p>
 
                     <p style="margin-top: 40px; font-size: 0.85rem; color: #6B7280; font-style: italic;">*Note : ce plan est évolutif. Chaque module présent dans l'interface de visualisation doit être mis à jour régulièrement pour refléter l'état réel de notre écosystème.*</p>
-                </div>`;
-            break;
-        default:
-            container.innerHTML = `<div style="padding:20px; color:#9CA3AF; font-size:1.2rem;">Module « ${type} » en développement</div>`;
-    }
-}
- window.addEventListener("load", () => {
-    initNetwork();
-
-    const holder = document.getElementById('network-holder');
-    holder.addEventListener('wheel', function (e) {
-        if (!network) return; // N'intervient que si le réseau est chargé
-        
-        e.preventDefault();
-        
-        const oldScale = network.getScale();
-        const zoomFactor = 1.12;
-        const newScale = e.deltaY < 0 ? oldScale * zoomFactor : oldScale / zoomFactor;
-
-        if (newScale < 0.05 || newScale > 4) return;
-
-        const rect = holder.getBoundingClientRect();
-        const pointerCanvas = network.DOMtoCanvas({
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top
-        });
-        
-        const currentCenter = network.getViewPosition();
-        const newCenterX = pointerCanvas.x - (pointerCanvas.x - currentCenter.x) * (oldScale / newScale);
-        const newCenterY = pointerCanvas.y - (pointerCanvas.y - currentCenter.y) * (oldScale / newScale);
-
-        network.moveTo({
-            position: { x: newCenterX, y: newCenterY },
-            scale: newScale
-        });
-    }, { passive: false });
-});
-    </script>
+     
+        </div>
+</template>
 </body>
 </html>
