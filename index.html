@@ -153,20 +153,20 @@
 
         .scalar-value { color: var(--text-dark); width: 65%; font-weight: 500; word-break: break-word; }
 
-/* Correction pour Mermaid */
 .mermaid {
     width: 100%;
     height: 100%;
-    overflow: auto;
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: hidden;
 }
+
 .mermaid svg {
     max-width: 100%;
     max-height: 100%;
-    height: auto !important;
 }
+        
     </style>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 <script>mermaid.initialize({ startOnLoad: false });</script>
@@ -428,7 +428,13 @@ function switchMenu(type) {
     if(btnEl) btnEl.classList.add('active');
 
     const container = document.getElementById('network-holder');
-    container.innerHTML = ''; // Nettoyage total
+    
+    // Nettoyage sécurisé de l'instance réseau et du contenu
+    if (network) {
+        network.destroy();
+        network = null;
+    }
+    container.innerHTML = ''; 
 
     if (type === 'map') {
         const mermaidDiv = document.createElement('div');
@@ -441,26 +447,25 @@ function switchMenu(type) {
                 Aides --> CEE["Certificats d'Économie d'Énergie (CEE)"]
                 Aides --> Suram["Suramortissement"]
             end
-            %% ... (le reste de ton code Mermaid ici)
             Home --> Aides; Home --> Guides; Home --> Vehicules; Home --> Simulateur;
             Home --> Partners; Home --> FAQ; Home --> Glossaire; Home --> Actualites;
             Home --> About; Home --> Contact; Home --> Legal; Home --> CGU; Home --> Privacy`;
         
         container.appendChild(mermaidDiv);
         
-        // Initialisation Mermaid puis Zoom
-        mermaid.init(undefined, mermaidDiv).then(() => {
-            const svg = mermaidDiv.querySelector('svg');
-            if (svg) {
-                // Application du zoom sur le SVG fraîchement généré
-                svgPanZoom(svg, {
-                    zoomEnabled: true,
-                    controlIconsEnabled: true,
-                    fit: true,
-                    center: true
-                });
-            }
-        });
+        if (typeof mermaid !== 'undefined') {
+            mermaid.init(undefined, mermaidDiv).then(() => {
+                const svg = mermaidDiv.querySelector('svg');
+                if (svg) {
+                    svgPanZoom(svg, {
+                        zoomEnabled: true,
+                        controlIconsEnabled: true,
+                        fit: true,
+                        center: true
+                    });
+                }
+            }).catch(err => console.error("Erreur Mermaid :", err));
+        }
         
     } else if (type === 'links' || type === 'partners') {
         initNetwork();
@@ -469,36 +474,37 @@ function switchMenu(type) {
     }
 }
 
-        window.addEventListener("load", () => {
-            initNetwork();
+ window.addEventListener("load", () => {
+    initNetwork();
 
-            const holder = document.getElementById('network-holder');
-            holder.addEventListener('wheel', function (e) {
-                e.preventDefault();
-                if (!network) return;
+    const holder = document.getElementById('network-holder');
+    holder.addEventListener('wheel', function (e) {
+        if (!network) return; // N'intervient que si le réseau est chargé
+        
+        e.preventDefault();
+        
+        const oldScale = network.getScale();
+        const zoomFactor = 1.12;
+        const newScale = e.deltaY < 0 ? oldScale * zoomFactor : oldScale / zoomFactor;
 
-                const oldScale = network.getScale();
-                const zoomFactor = 1.12;
-                const newScale = e.deltaY < 0 ? oldScale * zoomFactor : oldScale / zoomFactor;
+        if (newScale < 0.05 || newScale > 4) return;
 
-                if (newScale < 0.05 || newScale > 4) return;
-
-                const rect = holder.getBoundingClientRect();
-                const pointerCanvas = network.DOMtoCanvas({
-                    x: e.clientX - rect.left,
-                    y: e.clientY - rect.top
-                });
-                
-                const currentCenter = network.getViewPosition();
-                const newCenterX = pointerCanvas.x - (pointerCanvas.x - currentCenter.x) * (oldScale / newScale);
-                const newCenterY = pointerCanvas.y - (pointerCanvas.y - currentCenter.y) * (oldScale / newScale);
-
-                network.moveTo({
-                    position: { x: newCenterX, y: newCenterY },
-                    scale: newScale
-                });
-            }, { passive: false });
+        const rect = holder.getBoundingClientRect();
+        const pointerCanvas = network.DOMtoCanvas({
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top
         });
+        
+        const currentCenter = network.getViewPosition();
+        const newCenterX = pointerCanvas.x - (pointerCanvas.x - currentCenter.x) * (oldScale / newScale);
+        const newCenterY = pointerCanvas.y - (pointerCanvas.y - currentCenter.y) * (oldScale / newScale);
+
+        network.moveTo({
+            position: { x: newCenterX, y: newCenterY },
+            scale: newScale
+        });
+    }, { passive: false });
+});
     </script>
 </body>
 </html>
