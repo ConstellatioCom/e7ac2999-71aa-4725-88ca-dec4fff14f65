@@ -441,75 +441,51 @@
     const container = document.getElementById('network-holder');
     container.innerHTML = ''; // Nettoyage total
 
-    if (type === 'map') {
-        const graphCode = `graph TD
-    Home["Accueil"]
-    subgraph Bloc_Aides ["Trois types d'aides"]
-        Aides["Aides"]
-        Aides --> Subventions["Subventions et Primes"]
-        Aides --> CEE["Certificats d'Économie d'Énergie (CEE)"]
-        Aides --> Suram["Suramortissement"]
-    end
-    subgraph Bloc_Guides ["Guide : le contexte, le combien, le comment"]
-        Guides["Guide de la transition de flotte"]
-        Guides --> G_Reg["Le contexte"]
-        Guides --> G_TCO["Le combien"]
-        Guides --> G_Fin["Le comment"]
-    end
-    subgraph Bloc_Vehicules ["Catalogue de véhicules"]
-        Vehicules["Véhicules"]
-        Vehicules --> V1["Véhicule 1"]
-        Vehicules --> V2["Véhicule 2"]
-        Vehicules --> V3["Véhicule 3"]
-    end
-    subgraph Bloc_Simulateur ["Simulateur d'aides"]
-        Simulateur["Simulateur"]
-    end
-    subgraph Bloc_Savoir ["Informations"]
-        Actualites["Actualités"]
-        Glossaire["Glossaire"]
-        FAQ["FAQ"]
-    end
-    subgraph Bloc_Identite ["Identité"]
-        About["À propos"]
-        Legal["Mentions légales"]
-        CGU["CGU"]
-        Privacy["Politique de confidentialité"]
-    end
-    subgraph Bloc_Ecosysteme ["Écosystème Rouler-O-vert"]
-        Partners["Partenaires"]
-    end
-    subgraph Bloc_Contact ["Relation avec le public"]
-        Contact["Contact"]
-    end
-    Home --> Aides
-    Home --> Guides
-    Home --> Vehicules
-    Home --> Simulateur
-    Home --> Partners
-    Home --> FAQ
-    Home --> Glossaire
-    Home --> Actualites
-    Home --> About
-    Home --> Contact
-    Home --> Legal
-    Home --> CGU
-    Home --> Privacy`;
+if (type === 'map') {
+        const nodes = [
+            { id: 'Home', label: 'Accueil' },
+            { id: 'Aides', label: 'Aides' },
+            { id: 'Subventions', label: 'Subventions' },
+            { id: 'CEE', label: 'CEE' },
+            { id: 'Suram', label: 'Suramortissement' },
+            { id: 'Guides', label: 'Guide transition' },
+            { id: 'G_Reg', label: 'Le contexte' },
+            { id: 'G_TCO', label: 'Le combien' },
+            { id: 'G_Fin', label: 'Le comment' },
+            { id: 'Vehicules', label: 'Véhicules' },
+            { id: 'Simulateur', label: 'Simulateur' },
+            { id: 'Savoir', label: 'Savoir' },
+            { id: 'Identite', label: 'Identité' },
+            { id: 'Partners', label: 'Partenaires' },
+            { id: 'Contact', label: 'Contact' }
+        ];
 
-        // Rendu asynchrone sécurisé pour un affichage stable
-        mermaid.render('mermaid-graph', graphCode).then(({ svg }) => {
-            container.innerHTML = `<div class="mermaid">${svg}</div>`;
-        }).catch(err => {
-            container.innerHTML = "Erreur de rendu du graphique.";
-            console.error(err);
-        });
+        const edges = [
+            { from: 'Home', to: 'Aides' }, { from: 'Home', to: 'Guides' },
+            { from: 'Home', to: 'Vehicules' }, { from: 'Home', to: 'Simulateur' },
+            { from: 'Home', to: 'Savoir' }, { from: 'Home', to: 'Identite' },
+            { from: 'Home', to: 'Partners' }, { from: 'Home', to: 'Contact' },
+            { from: 'Aides', to: 'Subventions' }, { from: 'Aides', to: 'CEE' },
+            { from: 'Aides', to: 'Suram' }, { from: 'Guides', to: 'G_Reg' },
+            { from: 'Guides', to: 'G_TCO' }, { from: 'Guides', to: 'G_Fin' }
+        ];
+
+        if (network !== null) { network.destroy(); }
         
+        network = new vis.Network(container, { 
+            nodes: new vis.DataSet(nodes), 
+            edges: new vis.DataSet(edges) 
+        }, {
+            nodes: { shape: 'dot', size: 15, color: '#00824A', font: { face: 'Public Sans' } },
+            edges: { color: '#E5E7EB' },
+            physics: { enabled: true, barnesHut: { gravitationalConstant: -2000 } }
+        });
+
     } else if (type === 'links' || type === 'partners') {
         initNetwork();
     } else {
         container.innerHTML = `<div style="display:flex; justify-content:center; align-items:center; height:100%; color:#9CA3AF; font-size:1.2rem;">Module « ${type} » en développement</div>`;
     }
-}
 
         window.addEventListener("load", () => {
             initNetwork();
