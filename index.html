@@ -416,9 +416,8 @@
             });
         }
 
-    function switchMenu(type) {
+   function switchMenu(type) {
     currentDatasetType = type;
-    // Mise à jour de l'interface sidebar/boutons
     document.querySelectorAll('.url-item').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.toggle-btn').forEach(el => el.classList.remove('active'));
     
@@ -428,71 +427,70 @@
     if(btnEl) btnEl.classList.add('active');
 
     const container = document.getElementById('network-holder');
+    container.innerHTML = ''; // Nettoyage total du conteneur
 
     if (type === 'map') {
-        // Nettoyage et injection du bloc Mermaid
-        container.innerHTML = `
-            <div class="mermaid" style="width:100%; height:100%; display:flex; justify-content:center; align-items:center;">
-                graph TD
-                Home["Accueil"]
-                subgraph Bloc_Aides ["Trois types d'aides"]
-                    Aides["Aides"]
-                    Aides --> Subventions["Subventions et Primes"]
-                    Aides --> CEE["Certificats d'Économie d'Énergie (CEE)"]
-                    Aides --> Suram["Suramortissement"]
-                end
-                subgraph Bloc_Guides ["Guide : le contexte, le combien, le comment"]
-                    Guides["Guide de la transition de flotte"]
-                    Guides --> G_Reg["Le contexte"]
-                    Guides --> G_TCO["Le combien"]
-                    Guides --> G_Fin["Le comment"]
-                end
-                subgraph Bloc_Vehicules ["Catalogue de véhicules"]
-                    Vehicules["Véhicules"]
-                    Vehicules --> V1["Véhicule 1"]
-                    Vehicules --> V2["Véhicule 2"]
-                    Vehicules --> V3["Véhicule 3"]
-                end
-                subgraph Bloc_Simulateur ["Simulateur d'aides"]
-                    Simulateur["Simulateur"]
-                end
-                subgraph Bloc_Savoir ["Informations"]
-                    Actualites["Actualités"]
-                    Glossaire["Glossaire"]
-                    FAQ["FAQ"]
-                end
-                subgraph Bloc_Identite ["Identité"]
-                    About["À propos"]
-                    Legal["Mentions légales"]
-                    CGU["CGU"]
-                    Privacy["Politique de confidentialité"]
-                end
-                subgraph Bloc_Ecosysteme ["Écosystème Rouler-O-vert"]
-                    Partners["Partenaires"]
-                end
-                subgraph Bloc_Contact ["Relation avec le public"]
-                    Contact["Contact"]
-                end
-                Home --> Aides
-                Home --> Guides
-                Home --> Vehicules
-                Home --> Simulateur
-                Home --> Partners
-                Home --> FAQ
-                Home --> Glossaire
-                Home --> Actualites
-                Home --> About
-                Home --> Contact
-                Home --> Legal
-                Home --> CGU
-                Home --> Privacy
-            </div>`;
+        const mermaidDiv = document.createElement('div');
+        mermaidDiv.className = 'mermaid';
+        // Utilisation de .textContent pour éviter que le navigateur n'interprète des balises HTML
+        mermaidDiv.textContent = `graph TD
+    Home["Accueil"]
+    subgraph Bloc_Aides ["Trois types d'aides"]
+        Aides["Aides"]
+        Aides --> Subventions["Subventions et Primes"]
+        Aides --> CEE["Certificats d'Économie d'Énergie (CEE)"]
+        Aides --> Suram["Suramortissement"]
+    end
+    subgraph Bloc_Guides ["Guide : le contexte, le combien, le comment"]
+        Guides["Guide de la transition de flotte"]
+        Guides --> G_Reg["Le contexte"]
+        Guides --> G_TCO["Le combien"]
+        Guides --> G_Fin["Le comment"]
+    end
+    subgraph Bloc_Vehicules ["Catalogue de véhicules"]
+        Vehicules["Véhicules"]
+        Vehicules --> V1["Véhicule 1"]
+        Vehicules --> V2["Véhicule 2"]
+        Vehicules --> V3["Véhicule 3"]
+    end
+    subgraph Bloc_Simulateur ["Simulateur d'aides"]
+        Simulateur["Simulateur"]
+    end
+    subgraph Bloc_Savoir ["Informations"]
+        Actualites["Actualités"]
+        Glossaire["Glossaire"]
+        FAQ["FAQ"]
+    end
+    subgraph Bloc_Identite ["Identité"]
+        About["À propos"]
+        Legal["Mentions légales"]
+        CGU["CGU"]
+        Privacy["Politique de confidentialité"]
+    end
+    subgraph Bloc_Ecosysteme ["Écosystème Rouler-O-vert"]
+        Partners["Partenaires"]
+    end
+    subgraph Bloc_Contact ["Relation avec le public"]
+        Contact["Contact"]
+    end
+    Home --> Aides
+    Home --> Guides
+    Home --> Vehicules
+    Home --> Simulateur
+    Home --> Partners
+    Home --> FAQ
+    Home --> Glossaire
+    Home --> Actualites
+    Home --> About
+    Home --> Contact
+    Home --> Legal
+    Home --> CGU
+    Home --> Privacy`;
         
-        // Initialisation forcée de Mermaid sur le nouveau contenu
-        mermaid.init(undefined, container.querySelector('.mermaid'));
+        container.appendChild(mermaidDiv);
+        mermaid.init(undefined, mermaidDiv);
         
     } else if (type === 'links' || type === 'partners') {
-        container.innerHTML = '';
         initNetwork();
     } else {
         container.innerHTML = `<div style="display:flex; justify-content:center; align-items:center; height:100%; color:#9CA3AF; font-size:1.2rem;">Module « ${type} » en développement</div>`;
