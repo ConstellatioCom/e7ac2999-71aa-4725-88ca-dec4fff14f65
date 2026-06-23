@@ -526,6 +526,14 @@ function switchMenu(type) {
 ]</pre>
                 </div>`;
             break;
+            case 'reco':
+            container.innerHTML = `
+                <div style="width: 100%; height: 100%; overflow: hidden;">
+                    <iframe loading="lazy" style="width: 100%; height: 100%; border: none;"
+                        src="https://www.canva.com/design/DAHNbNwpKIo/spHpg-wVL-MbR8h7a5Q4cg/view?embed" allowfullscreen="allowfullscreen" allow="fullscreen">
+                    </iframe>
+                </div>`;
+            break;
         default:
             container.innerHTML = `<div style="padding:20px; color:#9CA3AF; font-size:1.2rem;">Module « ${type} » en développement</div>`;
     }
