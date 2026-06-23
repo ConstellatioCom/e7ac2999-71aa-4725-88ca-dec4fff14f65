@@ -467,16 +467,19 @@ function switchMenu(type) {
     }
     container.innerHTML = ''; 
 
-  if (type === 'map') {
+if (type === 'map') {
         loadSvgMap();
-        
     } else if (type === 'links' || type === 'partners') {
         initNetwork();
+    } else if (type === 'arch' || type === 'keys') {
+        const url = (type === 'arch') 
+            ? 'https://airtable.com/embed/appsmlOX1VzOq8L5S/shrXT3OgnqLfNl4mS?viewControls=on' 
+            : 'https://airtable.com/embed/appsmlOX1VzOq8L5S/shrSTADeVpvs73FeS?viewControls=on';
+        container.innerHTML = `<iframe class="airtable-embed" src="${url}" frameborder="0" width="100%" height="100%" style="background: transparent; border: none;"></iframe>`;
     } else {
         container.innerHTML = `<div style="display:flex; justify-content:center; align-items:center; height:100%; color:#9CA3AF; font-size:1.2rem;">Module « ${type} » en développement</div>`;
     }
 }
-
  window.addEventListener("load", () => {
     initNetwork();
 
