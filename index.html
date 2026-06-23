@@ -445,7 +445,7 @@ if (type === 'map') {
         const nodes = [
             { id: 'Home', label: 'Accueil' },
             { id: 'Aides', label: 'Aides' },
-            { id: 'Subventions', label: 'Subventions' },
+            { id: 'Subventions', label: 'Subventions et Primes' },
             { id: 'CEE', label: 'CEE' },
             { id: 'Suram', label: 'Suramortissement' },
             { id: 'Guides', label: 'Guide transition' },
@@ -453,9 +453,15 @@ if (type === 'map') {
             { id: 'G_TCO', label: 'Le combien' },
             { id: 'G_Fin', label: 'Le comment' },
             { id: 'Vehicules', label: 'Véhicules' },
+            { id: 'V1', label: 'V1' }, { id: 'V2', label: 'V2' }, { id: 'V3', label: 'V3' },
             { id: 'Simulateur', label: 'Simulateur' },
-            { id: 'Savoir', label: 'Savoir' },
-            { id: 'Identite', label: 'Identité' },
+            { id: 'Actualites', label: 'Actualités' },
+            { id: 'Glossaire', label: 'Glossaire' },
+            { id: 'FAQ', label: 'FAQ' },
+            { id: 'About', label: 'À propos' },
+            { id: 'Legal', label: 'Mentions légales' },
+            { id: 'CGU', label: 'CGU' },
+            { id: 'Privacy', label: 'Confidentialité' },
             { id: 'Partners', label: 'Partenaires' },
             { id: 'Contact', label: 'Contact' }
         ];
@@ -463,11 +469,12 @@ if (type === 'map') {
         const edges = [
             { from: 'Home', to: 'Aides' }, { from: 'Home', to: 'Guides' },
             { from: 'Home', to: 'Vehicules' }, { from: 'Home', to: 'Simulateur' },
-            { from: 'Home', to: 'Savoir' }, { from: 'Home', to: 'Identite' },
-            { from: 'Home', to: 'Partners' }, { from: 'Home', to: 'Contact' },
-            { from: 'Aides', to: 'Subventions' }, { from: 'Aides', to: 'CEE' },
-            { from: 'Aides', to: 'Suram' }, { from: 'Guides', to: 'G_Reg' },
-            { from: 'Guides', to: 'G_TCO' }, { from: 'Guides', to: 'G_Fin' }
+            { from: 'Aides', to: 'Subventions' }, { from: 'Aides', to: 'CEE' }, { from: 'Aides', to: 'Suram' },
+            { from: 'Guides', to: 'G_Reg' }, { from: 'Guides', to: 'G_TCO' }, { from: 'Guides', to: 'G_Fin' },
+            { from: 'Vehicules', to: 'V1' }, { from: 'Vehicules', to: 'V2' }, { from: 'Vehicules', to: 'V3' },
+            { from: 'Home', to: 'Partners' }, { from: 'Home', to: 'FAQ' }, { from: 'Home', to: 'Glossaire' },
+            { from: 'Home', to: 'Actualites' }, { from: 'Home', to: 'About' }, { from: 'Home', to: 'Contact' },
+            { from: 'Home', to: 'Legal' }, { from: 'Home', to: 'CGU' }, { from: 'Home', to: 'Privacy' }
         ];
 
         if (network !== null) { network.destroy(); }
@@ -476,15 +483,11 @@ if (type === 'map') {
             nodes: new vis.DataSet(nodes), 
             edges: new vis.DataSet(edges) 
         }, {
-            nodes: { shape: 'dot', size: 15, color: '#00824A', font: { face: 'Public Sans' } },
+            nodes: { shape: 'box', color: '#00824A', font: { color: '#ffffff', face: 'Public Sans' } },
             edges: { color: '#E5E7EB' },
-            physics: { enabled: true, barnesHut: { gravitationalConstant: -2000 } }
+            physics: { enabled: true }
         });
-
-    } else if (type === 'links' || type === 'partners') {
-        initNetwork();
-    } else {
-        container.innerHTML = `<div style="display:flex; justify-content:center; align-items:center; height:100%; color:#9CA3AF; font-size:1.2rem;">Module « ${type} » en développement</div>`;
+        
     }
 
         window.addEventListener("load", () => {
