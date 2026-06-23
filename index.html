@@ -169,7 +169,18 @@
 }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
-<script>mermaid.initialize({ startOnLoad: false });</script>
+<script>
+    mermaid.initialize({ 
+        startOnLoad: false,
+        theme: 'default',
+        // Ajout des options pour l'interactivité
+        securityLevel: 'loose',
+        flowchart: {
+            useMaxWidth: true,
+            htmlLabels: true
+        }
+    });
+</script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/standalone/umd/vis-network.min.js"></script>
 </head>
 <body>
@@ -489,6 +500,13 @@
         
         container.appendChild(mermaidDiv);
         mermaid.init(undefined, mermaidDiv);
+
+        // Après mermaid.init(undefined, mermaidDiv);
+// On injecte le support du zoom via l'API Mermaid
+mermaid.run({
+    nodes: [mermaidDiv],
+    suppressErrors: true
+});
         
     } else if (type === 'links' || type === 'partners') {
         initNetwork();
