@@ -449,6 +449,10 @@
 }
 
 function switchMenu(type) {
+    // Gestion de la visibilité du panneau inspecteur
+    const inspector = document.querySelector('.inspector-panel');
+    inspector.style.display = (type === 'links' || type === 'partners') ? 'block' : 'none';
+
     currentDatasetType = type;
     document.querySelectorAll('.url-item').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.toggle-btn').forEach(el => el.classList.remove('active'));
@@ -467,7 +471,7 @@ function switchMenu(type) {
     }
     container.innerHTML = ''; 
 
-if (type === 'map') {
+    if (type === 'map') {
         loadSvgMap();
     } else if (type === 'links' || type === 'partners') {
         initNetwork();
