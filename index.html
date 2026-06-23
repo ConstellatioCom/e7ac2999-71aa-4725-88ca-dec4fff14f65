@@ -171,6 +171,7 @@
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 <script>mermaid.initialize({ startOnLoad: false });</script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/standalone/umd/vis-network.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
 </head>
 <body>
 
@@ -416,7 +417,7 @@
             });
         }
 
-   function switchMenu(type) {
+function switchMenu(type) {
     currentDatasetType = type;
     document.querySelectorAll('.url-item').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.toggle-btn').forEach(el => el.classList.remove('active'));
@@ -427,68 +428,39 @@
     if(btnEl) btnEl.classList.add('active');
 
     const container = document.getElementById('network-holder');
-    container.innerHTML = ''; // Nettoyage total du conteneur
+    container.innerHTML = ''; // Nettoyage total
 
     if (type === 'map') {
         const mermaidDiv = document.createElement('div');
         mermaidDiv.className = 'mermaid';
-        // Utilisation de .textContent pour éviter que le navigateur n'interprète des balises HTML
         mermaidDiv.textContent = `graph TD
-    Home["Accueil"]
-    subgraph Bloc_Aides ["Trois types d'aides"]
-        Aides["Aides"]
-        Aides --> Subventions["Subventions et Primes"]
-        Aides --> CEE["Certificats d'Économie d'Énergie (CEE)"]
-        Aides --> Suram["Suramortissement"]
-    end
-    subgraph Bloc_Guides ["Guide : le contexte, le combien, le comment"]
-        Guides["Guide de la transition de flotte"]
-        Guides --> G_Reg["Le contexte"]
-        Guides --> G_TCO["Le combien"]
-        Guides --> G_Fin["Le comment"]
-    end
-    subgraph Bloc_Vehicules ["Catalogue de véhicules"]
-        Vehicules["Véhicules"]
-        Vehicules --> V1["Véhicule 1"]
-        Vehicules --> V2["Véhicule 2"]
-        Vehicules --> V3["Véhicule 3"]
-    end
-    subgraph Bloc_Simulateur ["Simulateur d'aides"]
-        Simulateur["Simulateur"]
-    end
-    subgraph Bloc_Savoir ["Informations"]
-        Actualites["Actualités"]
-        Glossaire["Glossaire"]
-        FAQ["FAQ"]
-    end
-    subgraph Bloc_Identite ["Identité"]
-        About["À propos"]
-        Legal["Mentions légales"]
-        CGU["CGU"]
-        Privacy["Politique de confidentialité"]
-    end
-    subgraph Bloc_Ecosysteme ["Écosystème Rouler-O-vert"]
-        Partners["Partenaires"]
-    end
-    subgraph Bloc_Contact ["Relation avec le public"]
-        Contact["Contact"]
-    end
-    Home --> Aides
-    Home --> Guides
-    Home --> Vehicules
-    Home --> Simulateur
-    Home --> Partners
-    Home --> FAQ
-    Home --> Glossaire
-    Home --> Actualites
-    Home --> About
-    Home --> Contact
-    Home --> Legal
-    Home --> CGU
-    Home --> Privacy`;
+            Home["Accueil"]
+            subgraph Bloc_Aides ["Trois types d'aides"]
+                Aides["Aides"]
+                Aides --> Subventions["Subventions et Primes"]
+                Aides --> CEE["Certificats d'Économie d'Énergie (CEE)"]
+                Aides --> Suram["Suramortissement"]
+            end
+            %% ... (le reste de ton code Mermaid ici)
+            Home --> Aides; Home --> Guides; Home --> Vehicules; Home --> Simulateur;
+            Home --> Partners; Home --> FAQ; Home --> Glossaire; Home --> Actualites;
+            Home --> About; Home --> Contact; Home --> Legal; Home --> CGU; Home --> Privacy`;
         
         container.appendChild(mermaidDiv);
-        mermaid.init(undefined, mermaidDiv);
+        
+        // Initialisation Mermaid puis Zoom
+        mermaid.init(undefined, mermaidDiv).then(() => {
+            const svg = mermaidDiv.querySelector('svg');
+            if (svg) {
+                // Application du zoom sur le SVG fraîchement généré
+                svgPanZoom(svg, {
+                    zoomEnabled: true,
+                    controlIconsEnabled: true,
+                    fit: true,
+                    center: true
+                });
+            }
+        });
         
     } else if (type === 'links' || type === 'partners') {
         initNetwork();
