@@ -172,13 +172,7 @@
     bottom: 20px !important;
     top: auto !important;
 }
-        #network-holder iframe {
-    display: block;
-    width: 100%;
-    height: 100%;
-    border: none;
-    overflow: hidden; /* Empêche les bandes de défilement internes */
-}
+    
     </style>
  
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/standalone/umd/vis-network.min.js"></script>
@@ -428,6 +422,32 @@
             });
         }
 
+        async function loadSvgMap() {
+    const container = document.getElementById('network-holder');
+    container.innerHTML = '<div style="padding:20px; color:#4B5563;">Chargement de la carte...</div>';
+
+    try {
+        const response = await fetch('assets/architecture.svg'); 
+        if (!response.ok) throw new Error('Fichier introuvable');
+        
+        const svgText = await response.text();
+        container.innerHTML = `<div id="svg-wrapper" style="width:100%; height:100%;">${svgText}</div>`;
+        
+        const svgElement = container.querySelector('svg');
+        svgElement.setAttribute('width', '100%');
+        svgElement.setAttribute('height', '100%');
+        
+        svgPanZoom(svgElement, {
+            zoomEnabled: true,
+            controlIconsEnabled: true,
+            fit: true,
+            center: true
+        });
+    } catch (err) {
+        container.innerHTML = '<div style="padding:20px; color:red;">Erreur lors du chargement.</div>';
+    }
+}
+
 function switchMenu(type) {
     currentDatasetType = type;
     document.querySelectorAll('.url-item').forEach(el => el.classList.remove('active'));
@@ -448,7 +468,7 @@ function switchMenu(type) {
     container.innerHTML = ''; 
 
   if (type === 'map') {
-        container.innerHTML = `<iframe src="https://mermaid.ai/d/51d78023-b4a7-4178-adc2-dc2a0065f831" frameborder="0" scrolling="no"></iframe>`;
+        loadSvgMap();
         
     } else if (type === 'links' || type === 'partners') {
         initNetwork();
