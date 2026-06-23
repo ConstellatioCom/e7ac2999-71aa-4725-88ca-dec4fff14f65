@@ -434,7 +434,7 @@ function switchMenu(type) {
 
     const container = document.getElementById('network-holder');
     
-    // Nettoyage sécurisé de l'instance réseau et du contenu
+    // Nettoyage de l'instance réseau
     if (network) {
         network.destroy();
         network = null;
@@ -442,67 +442,12 @@ function switchMenu(type) {
     container.innerHTML = ''; 
 
     if (type === 'map') {
-        const mermaidDiv = document.createElement('div');
-        mermaidDiv.className = 'mermaid';
-       mermaidDiv.textContent = `graph TD
-    Home["Accueil"]
-    subgraph Bloc_Aides ["Trois types d'aides"]
-        Aides["Aides"]
-        Aides --> Subventions["Subventions et Primes"]
-        Aides --> CEE["Certificats d'Économie d'Énergie (CEE)"]
-        Aides --> Suram["Suramortissement"]
-    end
-    subgraph Bloc_Guides ["Guide : le contexte, le combien, le comment"]
-        Guides["Guide de la transition de flotte"]
-        Guides --> G_Reg["Le contexte"]
-        Guides --> G_TCO["Le combien"]
-        Guides --> G_Fin["Le comment"]
-    end
-    subgraph Bloc_Vehicules ["Catalogue de véhicules"]
-        Vehicules["Véhicules"]
-        Vehicules --> V1["Véhicule 1"]
-        Vehicules --> V2["Véhicule 2"]
-        Vehicules --> V3["Véhicule 3"]
-    end
-    subgraph Bloc_Simulateur ["Simulateur d'aides"]
-        Simulateur["Simulateur"]
-    end
-    subgraph Bloc_Savoir ["Informations"]
-        Actualites["Actualités"]
-        Glossaire["Glossaire"]
-        FAQ["FAQ"]
-    end
-    subgraph Bloc_Identite ["Identité"]
-        About["À propos"]
-        Legal["Mentions légales"]
-        CGU["CGU"]
-        Privacy["Politique de confidentialité"]
-    end
-    subgraph Bloc_Ecosysteme ["Écosystème Rouler-O-vert"]
-        Partners["Partenaires"]
-    end
-    subgraph Bloc_Contact ["Relation avec le public"]
-        Contact["Contact"]
-    end
-    Home --> Aides; Home --> Guides; Home --> Vehicules; Home --> Simulateur;
-    Home --> Partners; Home --> FAQ; Home --> Glossaire; Home --> Actualites;
-    Home --> About; Home --> Contact; Home --> Legal; Home --> CGU; Home --> Privacy`;
-        
-        container.appendChild(mermaidDiv);
-        
-        if (typeof mermaid !== 'undefined') {
-            mermaid.init(undefined, mermaidDiv).then(() => {
-                const svg = mermaidDiv.querySelector('svg');
-                if (svg) {
-                    svgPanZoom(svg, {
-                        zoomEnabled: true,
-                        controlIconsEnabled: true,
-                        fit: true,
-                        center: true
-                    });
-                }
-            }).catch(err => console.error("Erreur Mermaid :", err));
-        }
+        const iframe = document.createElement('iframe');
+        iframe.src = "https://mermaid.ai/d/51d78023-b4a7-4178-adc2-dc2a0065f831";
+        iframe.style.width = "100%";
+        iframe.style.height = "100%";
+        iframe.style.border = "none";
+        container.appendChild(iframe);
         
     } else if (type === 'links' || type === 'partners') {
         initNetwork();
