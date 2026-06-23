@@ -534,6 +534,53 @@ function switchMenu(type) {
                     </iframe>
                 </div>`;
             break;
+            case 'plan':
+            container.innerHTML = `
+                <div style="padding: 40px; max-width: 800px; margin: 0 auto; color: #111827; line-height: 1.6;">
+                    <h1 style="color: #00824A; margin-bottom: 20px;">Plan stratégique – Écosystème Rouler-O-vert</h1>
+                    <hr style="border: 0; border-top: 1px solid #E5E7EB; margin-bottom: 30px;">
+                    
+                    <h2 style="font-size: 1.2rem; margin-top: 25px;">1. Profil de liens SEO</h2>
+                    <p>Analyse de l'insertion actuelle sur le web pour identifier les acquis et les opportunités de nouveaux sites référents.</p>
+
+                    <h2 style="font-size: 1.2rem; margin-top: 25px;">2. Partenaires SEO</h2>
+                    <p>Identification proactive des acteurs clés pour solliciter des liens hypertextes de qualité et renforcer notre présence au sein de l'écosystème de la logistique durable.</p>
+
+                    <h2 style="font-size: 1.2rem; margin-top: 25px;">3. Cartographie du site</h2>
+                    <p>Organisation structurelle répondant aux missions de renseigner et d'évaluer :</p>
+                    <ul style="margin-left: 20px; margin-bottom: 15px;">
+                        <li><strong>Guide :</strong> cadre réglementaire et modalités de financement.</li>
+                        <li><strong>Information :</strong> centralisation du savoir (glossaire, FAQ, actualités).</li>
+                        <li><strong>Évaluation :</strong> cœur de métier et mission de service public via le simulateur.</li>
+                        <li><strong>Identité :</strong> section « à propos » et mise en avant de notre écosystème.</li>
+                        <li><strong>Aides :</strong> page pivot de synthèse accompagnée des trois typologies d'aides détaillées.</li>
+                    </ul>
+
+                    <h2 style="font-size: 1.2rem; margin-top: 25px;">4. Architecture et sémantique</h2>
+                    <p>Structuration du contenu pour les moteurs de recherche :</p>
+                    <ul style="margin-left: 20px;">
+                        <li><strong>Paramètres SEO :</strong> optimisation des URL, des titres et des meta-descriptions.</li>
+                        <li><strong>Hiérarchie :</strong> utilisation des balises H1 pour structurer la lecture.</li>
+                        <li><strong>Stratégie de mots-clés :</strong> exploitation d'un mot-clé principal et de termes secondaires par page.</li>
+                    </ul>
+
+                    <h2 style="font-size: 1.2rem; margin-top: 25px;">5. Données structurées</h2>
+                    <p>Implémentation d'un balisage en langage universel (JSON-LD) pour une reconnaissance parfaite par les moteurs de recherche et les IA :</p>
+                    <ul style="margin-left: 20px;">
+                        <li><strong>Organisation :</strong> description de notre entité légale.</li>
+                        <li><strong>Logiciel :</strong> fiche technique du simulateur.</li>
+                        <li><strong>Site web :</strong> marquage complet facilitant la compréhension de notre graphe de connaissances.</li>
+                    </ul>
+
+                    <h2 style="font-size: 1.2rem; margin-top: 25px;">6. Recommandations techniques</h2>
+                    <p>Module regroupant les optimisations prioritaires pour assurer la performance, la rapidité et la conformité du site aux standards du web.</p>
+
+                    <h2 style="font-size: 1.2rem; margin-top: 25px;">7. Étude de mots-clés</h2>
+                    <p>Analyse et sélection des termes cibles pour le référencement naturel.</p>
+
+                    <p style="margin-top: 40px; font-size: 0.85rem; color: #6B7280; font-style: italic;">*Note : ce plan est évolutif. Chaque module présent dans l'interface de visualisation doit être mis à jour régulièrement pour refléter l'état réel de notre écosystème.*</p>
+                </div>`;
+            break;
         default:
             container.innerHTML = `<div style="padding:20px; color:#9CA3AF; font-size:1.2rem;">Module « ${type} » en développement</div>`;
     }
